@@ -71,47 +71,5 @@ simulated_data <- data.frame(num1 = num1_sim, num2 = num2_sim, num3 = num3_sim, 
 augmented_data <- rbind(data, simulated_data)
 
 
-library(tidyverse)
-
-x<- "HIVH"
-
-todos_anagramas<-
-stringr::str_c(sample( unlist(strsplit(x, split = "")), 4^4, replace = TRUE),
-               sample( unlist(strsplit(x, split = "")), 4^4, replace = TRUE),
-               sample( unlist(strsplit(x, split = "")), 4^4, replace = TRUE),
-               sample( unlist(strsplit(x, split = "")), 4^4, replace = TRUE))
-
-unique(unlist(strsplit(x, split = "")))
-
-
-anagramas_validos<-
-purrr::map_dfr(unique(unlist(strsplit(x, split = ""))), function(letra){
-  
-  palavra_certa<-
-  purrr::map_chr(todos_anagramas, function(palavra){
-    #print(letra)
-    conta_letra <- str_count(x, letra)
-    #print(conta_letra)
-    print(stringr::str_count(palavra,letra))
-    if (stringr::str_count(palavra,letra)>conta_letra){
-      print(palavra)
-      print("Número de letras inadequado")
-      return("")
-    }
-    #print("Número de letras ok")
-    palavra
-  })
-  #print(palavra_certa)
-  tibble(palavra= palavra_certa)
-  #palavra_certa
-})
-
-anagramas <-
-  (anagramas_validos %>%
-  filter(palavra!="") %>%
-  distinct(palavra))$palavra
-  
-
-anagramas <- unique(anagramas)
 
 
