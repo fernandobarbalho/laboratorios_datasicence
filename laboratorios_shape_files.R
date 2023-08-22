@@ -98,6 +98,12 @@ ibge2022 %>%
   inner_join(Municipios_da_Amazonia_Legal_2022) %>%
   slice_max(order_by = populacao_residente, n=10)
 
+populacao_milhao<-
+  ibge2022 %>%
+  rename(cd_mun = municipio_codigo) %>%
+  inner_join(Municipios_da_Amazonia_Legal_2022) %>%
+  filter(populacao_residente >= 10^6)
+
 
 sf_top_10_populacao<-
   sedes_amazonia %>%
@@ -107,15 +113,42 @@ sf_top_10_populacao<-
   )
 
 
+sf_populacao_milhao<-
+  sedes_amazonia %>%
+  inner_join(
+    populacao_milhao %>%
+      mutate(code_muni = as.numeric(cd_mun))
+  )
+
+
 data("world")
 
 southamerica<-
   world %>%
-  filter(continent=="South America" )
+  filter(continent=="South America" |
+           iso_a2=="FR" ) 
+
+
+
+southamerica$lon<- sf::st_coordinates(sf::st_centroid(southamerica$geom))[,1]   
+southamerica$lat<- sf::st_coordinates(sf::st_centroid(southamerica$geom))[,2]
+
+
+
+
+southamerica_names<-
+southamerica %>%
+  filter(iso_a2 %in% c("BO","PE","CO","VE", "GY", "SR", "FR"))  %>%
+  mutate(lon = ifelse(iso_a2== "FR", -52.3354,lon)) %>%
+  mutate(lat = case_when(
+    iso_a2 == "FR" ~ 4.9380,
+    iso_a2 == "VE" ~ 4.9380,
+    .default = lat
+  )
+
+    
+)
   
-  
-  ggplot() +
-  geom_sf()
 
 
 amazonia_legal_sf<-  
@@ -133,15 +166,24 @@ mapa_municipios %>%
 ggplot() +
   geom_sf(data = southamerica, fill="#DCDCDC")+
   geom_sf(data= brasil, fill= "#808080")+
-  geom_sf(data=amazonia_legal_sf, aes(fill=populacao_residente/1000), color = "lightgray") +
+  geom_sf(data=amazonia_legal_sf, aes(fill=populacao_residente/10^6), color = "lightgray") +
   geom_sf(data=estados, fill=NA)+
-  geom_sf(data= sf_top_10_populacao, color="black", size=1)+
-  geom_text_repel(data = sf_top_10_populacao,
-                  aes(x=lon, y=lat, label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/1000,0)),20)), 
+  #geom_sf(data= sf_populacao_milhao, color="black", size=1)+
+  geom_text(data = sf_populacao_milhao,
+                  aes(x=lon, y=lat, 
+                      label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/10^6,1)),20)), 
                   color = "black", 
-                  #fontface = "bold", 
+                  fontface = "bold", 
+                  size = 2.9,
+            show.legend = FALSE
+  )+
+  geom_text(data = southamerica_names,
+                  aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
+                  color = "black", 
+                  fontface = "bold", 
                   size = 2.9
   )+
+
   coord_sf(xlim = c(xmin,xmax), ylim=c(ymin,ymax))+
   scale_fill_continuous_sequential(palette= "Heat" )+
   theme_void() +
@@ -149,7 +191,7 @@ ggplot() +
     panel.background = element_rect(fill="#0077be")
   ) +
   labs(
-    fill= "População em milhares"
+    fill= str_wrap("População em milhões de habitantes", 30)
       )
 
     
