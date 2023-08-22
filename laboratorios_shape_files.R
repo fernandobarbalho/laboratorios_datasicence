@@ -163,18 +163,21 @@ mapa_municipios %>%
   ) 
 
 
+
+#mapa com área
 ggplot() +
   geom_sf(data = southamerica, fill="#DCDCDC")+
   geom_sf(data= brasil, fill= "#808080")+
-  geom_sf(data=amazonia_legal_sf, aes(fill=populacao_residente/10^6), color = "lightgray") +
+  geom_sf(data=amazonia_legal_sf, aes(fill=populacao_residente/10^6), color = "white") +
   geom_sf(data=estados, fill=NA)+
   #geom_sf(data= sf_populacao_milhao, color="black", size=1)+
-  geom_text(data = sf_populacao_milhao,
-                  aes(x=lon, y=lat, 
-                      label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/10^6,1)),20)), 
+  geom_sf_text(data = sf_populacao_milhao,
+                  aes(label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/10^6,1)),20)), 
                   color = "black", 
                   fontface = "bold", 
                   size = 2.9,
+               nudge_y = -0.2,
+               
             show.legend = FALSE
   )+
   geom_text(data = southamerica_names,
@@ -193,6 +196,97 @@ ggplot() +
   labs(
     fill= str_wrap("População em milhões de habitantes", 30)
       )
+
+
+
+#Tentativa com viridis
+ggplot() +
+  geom_sf(data = southamerica, fill="#DCDCDC")+
+  geom_sf(data= brasil, fill= "#808080")+
+  geom_sf(data=amazonia_legal_sf, aes(fill=populacao_residente/10^6), color = "black") +
+  geom_sf(data=estados, fill=NA)+
+  #geom_sf(data= sf_populacao_milhao, color="black", size=1)+
+  geom_sf_text(data = sf_populacao_milhao,
+            aes(x=lon, y=lat, 
+                label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/10^6,1)),20)), 
+            color = "white", 
+            fontface = "bold", 
+            size = 2.9,
+            show.legend = FALSE
+  )+
+  geom_text(data = southamerica_names,
+            aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
+            color = "black", 
+            fontface = "bold", 
+            size = 2.9
+  )+
+  
+  coord_sf(xlim = c(xmin,xmax), ylim=c(ymin,ymax))+
+  scale_fill_viridis() +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill="#0077be")
+  ) +
+  labs(
+    fill= str_wrap("População em milhões de habitantes", 30)
+  )
+
+
+##Tentativa de Gráfico com pontos (rejeitada)
+
+amazonia_legal_seats<-  
+  sedes_municipios %>%
+  inner_join(
+    Municipios_da_Amazonia_Legal_2022 %>%
+      mutate(code_muni = as.numeric(cd_mun))
+  ) %>%
+  inner_join(
+    ibge2022 %>%
+      mutate(code_muni = as.numeric(municipio_codigo))
+  ) 
+
+
+ggplot() +
+  geom_sf(data = southamerica, fill="#DCDCDC")+
+  geom_sf(data= brasil, fill= "#808080")+
+  geom_sf(data=estados, fill="black")+
+  geom_sf(data=amazonia_legal_seats, 
+          aes(fill=populacao_residente/10^6),
+          pch=21, 
+          color = "#444444",
+          size=1) +
+  geom_sf(data=sf_populacao_milhao, 
+          aes(fill=populacao_residente/10^6),
+          pch=21, 
+          color = "#444444",
+          size=2) +
+  geom_sf_text(data = sf_populacao_milhao,
+               aes(label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/10^6,1)),20)), 
+               color = "white", 
+               fontface = "bold", 
+               size = 2.9,
+               nudge_y = -0.2,
+               
+               show.legend = FALSE
+  )+
+  geom_text(data = southamerica_names,
+            aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
+            color = "black", 
+            fontface = "bold", 
+            size = 2.9
+  )+
+  
+  coord_sf(xlim = c(xmin,xmax), ylim=c(ymin,ymax))+
+  scale_fill_continuous_sequential(palette= "Heat" )+
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill="#0077be")
+  ) +
+  labs(
+    fill= str_wrap("População em milhões de habitantes", 30)
+  )
+
+
 
     
 
