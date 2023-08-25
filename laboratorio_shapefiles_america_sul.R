@@ -11,6 +11,8 @@ data("world")
 
 #mapa mundi
 
+#Terra, Caetano
+
 world %>%
   ggplot() +
   geom_sf(aes(fill=pop/10^6)) +
@@ -39,6 +41,7 @@ world %>%
 
 
 #Mapa américa do sul
+#Soy loco por ti América
 world %>%
   filter(continent == "South America") %>%
   ggplot() +
@@ -70,9 +73,48 @@ world %>%
 
 #Mapa da América do Sul com os nomes dos países e coordenadas
 
+southamerica<-
+  world %>%
+  filter(continent=="South America") 
 
+
+
+southamerica$lon<- sf::st_coordinates(sf::st_centroid(southamerica$geom))[,1]   
+southamerica$lat<- sf::st_coordinates(sf::st_centroid(southamerica$geom))[,2]
+
+world %>%
+  filter(continent == "South America") %>%
+  ggplot() +
+  geom_sf(aes(fill=pop)) +
+  scale_fill_continuous_sequential(palette= "Heat", trans= "log2" )+
+  theme_light() +
+  theme(
+    panel.background = element_rect(fill="#0077be")
+  ) +
+  labs(
+    fill= str_wrap("População", 30)
+  )+
+  geom_text_repel(data = southamerica,
+            aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
+            color = "black", 
+            fontface = "bold", 
+            size = 2.9)
+
+
+
+sf::st_centroid(franca[[11]][[1]])
 
 #Mapa da França
+franca<-
+  world %>%
+  filter(iso_a2 == "FR")
+  
+
+brasil_spdata<-
+  world %>%
+  filter(iso_a2 == "BR")
+
+
 world %>%
   filter(iso_a2 == "FR") %>%
   ggplot() +
@@ -85,6 +127,24 @@ world %>%
   labs(
     fill= str_wrap("População", 30)
   )
+
+
+
+#Mapa da América do Sul incluindo a França
+
+
+fab<-
+insee::get_dataset_list()
+
+fab2<-
+  insee::get_insee_idbank("TCRED-ESTIMATIONS-POPULATION")
+
+
+idbank_list <- insee::get_idbank_list('TCRED-ESTIMATIONS-POPULATION')
+
+data_guiana<-
+  insee::get_insee_idbank("001760178")
+
 
 
 
