@@ -34,10 +34,7 @@ gera_tabela_ibge_municipios<- function(){
   
   # API endpoint URL
   api_url <- "https://apisidra.ibge.gov.br/values/t/4714/n6/all/v/all/p/all/d/v614%202"
-  
-  
-  
-  
+
   data_list <- fromJSON(api_url)
   
   

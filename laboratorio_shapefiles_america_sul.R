@@ -53,7 +53,6 @@ data("world")
 
 #mapa mundi
 
-#Terra, Caetano
 
 world %>%
   ggplot() +
@@ -64,7 +63,7 @@ world %>%
     panel.background = element_rect(fill="#0077be")
   ) +
   labs(
-    fill= str_wrap("População em milhões de habitantes", 30)
+    fill= str_wrap("População em milhões de habitantes", 10)
   )
 
 
@@ -74,16 +73,14 @@ world %>%
   scale_fill_continuous_sequential(palette= "Heat 2", trans= "log2" )+
   theme_void() +
   theme(
-    panel.background = element_rect(fill="#0077be")
-  ) +
-  labs(
-    fill= str_wrap("População", 30)
-  )
+    panel.background = element_rect(fill="#0077be"),
+    legend.position = "none"
+  ) 
 
 
 
 #Mapa américa do sul
-#Soy loco por ti América
+
 world %>%
   filter(continent == "South America") %>%
   ggplot() +
@@ -94,7 +91,7 @@ world %>%
     panel.background = element_rect(fill="#0077be")
   ) +
   labs(
-    fill= str_wrap("População em milhões de habitantes", 30)
+    fill= str_wrap("População em milhões de habitantes", 10)
   )
 
 
@@ -126,19 +123,19 @@ southamerica$lat<- sf::st_coordinates(sf::st_centroid(southamerica$geom))[,2]
 
 southamerica %>%
   ggplot() +
-  geom_sf(aes(fill=pop)) +
-  scale_fill_continuous_sequential(palette= "Heat 2", trans= "log2" )+
+  geom_sf(aes(fill=pop/10^6)) +
+  scale_fill_continuous_sequential(palette= "Heat 2" )+
   theme_light() +
   theme(
     panel.background = element_rect(fill="#0077be")
   ) +
   labs(
-    fill= str_wrap("População", 30)
+    fill= str_wrap("População em milhões de habitantes", 10)
   )+
   geom_text_repel(aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
                   color = "black", 
                   fontface = "bold", 
-                  size = 2.9)
+                  size = 2.8)
 
 
 
@@ -170,19 +167,19 @@ france %>%
 southamerica %>%
   bind_rows(france) %>%
   ggplot() +
-  geom_sf(aes(fill=pop)) +
-  scale_fill_continuous_sequential(palette= "Heat 2", trans= "log2" )+
+  geom_sf(aes(fill=pop/10^6)) +
+  scale_fill_continuous_sequential(palette= "Heat 2" )+
   theme_light() +
   theme(
     panel.background = element_rect(fill="#0077be")
   ) +
   labs(
-    fill= str_wrap("População", 30)
+    fill= str_wrap("População em milhões de habitantes", 10)
   )+
   geom_text_repel(aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
                   color = "black", 
                   fontface = "bold", 
-                  size = 2.9)
+                  size = 2.8)
 
 
 
@@ -200,7 +197,7 @@ southamerica %>%
   geom_text_repel(aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
                   color = "black", 
                   fontface = "bold", 
-                  size = 2.9)+
+                  size = 2.8)+
   coord_sf(xlim = c(-82,-35), ylim=c(-60,15))+
   theme_light() +
   theme(
@@ -235,19 +232,19 @@ southamerica %>%
   mutate(lon= ifelse(iso_a2=="FR", france[[11]][[1]][[1]][[1]][1,1], lon),
          lat= ifelse(iso_a2=="FR",france[[11]][[1]][[1]][[1]][1,2], lat)) %>%
   ggplot() +
-  geom_sf(aes(fill=pop)) +
-  scale_fill_continuous_sequential(palette= "Heat 2", trans= "log2" )+
+  geom_sf(aes(fill=pop/10^6)) +
+  scale_fill_continuous_sequential(palette= "Heat 2" )+
   geom_text_repel(aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
                   color = "black", 
                   fontface = "bold", 
-                  size = 2.9)+
+                  size = 2.8)+
   coord_sf(xlim = c(-82,-35), ylim=c(-60,15))+
   theme_light() +
   theme(
     panel.background = element_rect(fill="#0077be")
   ) +
   labs(
-    fill= str_wrap("População", 30)
+    fill= str_wrap("População em milhões de habitantes", 10)
   )
 
 
@@ -271,7 +268,7 @@ southamerica %>%
   geom_text_repel(aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
                   color = "black", 
                   fontface = "bold", 
-                  size = 2.9)+
+                  size = 2.8)+
   coord_sf(xlim = c(-82,-35), ylim=c(-60,15))+
   theme_void() +
   theme(
@@ -283,6 +280,11 @@ southamerica %>%
 
 
 ##Mapa com população dos estados do Brasil
+central_america<-
+  world %>%
+  filter(subregion == "Central America")
+
+
 
 brasil<- geobr::read_country()
 estados<- geobr::read_state()
@@ -312,10 +314,64 @@ southamerica %>%
   ggplot() +
   geom_sf(aes(fill=pop/10^6)) +
   geom_sf(data=estados, aes(fill=pop/10^6)) +
-  geom_sf(data=brasil,fill=NA, color="green")+
+  geom_sf(data=brasil,fill=NA, color="#00A859", lwd=1.2)+
   geom_sf(data= central_america,fill= "#808080")+
   scale_fill_continuous_sequential(palette= "Heat 2" )+
-  geom_text_repel(aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
+  geom_text_repel(aes(x=lon, y=lat, 
+                      label= str_wrap(name_long,20)), 
+                  color = "black", 
+                  fontface = "bold", 
+                  size = 2.8)+
+  coord_sf(xlim = c(-82,-35), ylim=c(-60,15))+
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill="#0077be")
+  ) +
+  labs(
+    fill= str_wrap("População em milhões", 10)
+  )
+
+
+##Mapa com população destaque para territórios de maiores populações
+
+
+estados$lon<- sf::st_coordinates(sf::st_centroid(estados$geom))[,1]   
+estados$lat<- sf::st_coordinates(sf::st_centroid(estados$geom))[,2]
+
+
+most_populated<-
+  southamerica %>%
+  filter(iso_a2 !="BR") %>%
+  rename(name= name_long) %>%
+  as_tibble() %>%
+  select(name, pop, lat, lon) %>%
+
+  bind_rows(
+    estados %>%
+      rename(name= name_state) %>%
+      as_tibble() %>%
+      select(name, pop, lat, lon)
+  ) %>%
+  slice_max(order_by = pop, n=8)
+    
+  
+
+southamerica %>%
+  filter(iso_a2!="BR") %>%
+  bind_rows(france) %>%
+  left_join(data_guiana) %>%
+  mutate(pop=ifelse(iso_a2=="FR",obs_value,pop))%>%
+  mutate(lon= ifelse(iso_a2=="FR", france[[11]][[1]][[1]][[1]][1,1], lon),
+         lat= ifelse(iso_a2=="FR",france[[11]][[1]][[1]][[1]][1,2], lat)) %>%
+  ggplot() +
+  geom_sf(aes(fill=pop/10^6)) +
+  geom_sf(data=estados, aes(fill=pop/10^6)) +
+  geom_sf(data=brasil,fill=NA, color="#00A859", lwd=1.2)+
+  geom_sf(data= central_america,fill= "#808080")+
+  scale_fill_continuous_sequential(palette= "Heat 2" )+
+  geom_text_repel(data= most_populated,
+                  aes(x=lon, y=lat, 
+                      label= str_c(str_wrap(name,10),": ",round(pop/10^6,1))), 
                   color = "black", 
                   fontface = "bold", 
                   size = 2.9)+
@@ -329,43 +385,4 @@ southamerica %>%
   )
 
 
-ggplot() +
-  geom_sf(data = southamerica, fill="#DCDCDC")+
-  geom_sf(data= brasil, fill= "#808080")+
-  geom_sf(data=amazonia_legal_sf, aes(fill=populacao_residente/10^6), color = "white") +
-  geom_sf(data=estados, fill=NA)+
-  #geom_sf(data= sf_populacao_milhao, color="black", size=1)+
-  geom_sf_text(data = sf_populacao_milhao,
-               aes(label= str_wrap(paste0(name_muni,":"," ", round(populacao_residente/10^6,1)),20)), 
-               color = "black", 
-               fontface = "bold", 
-               size = 2.9,
-               nudge_y = -0.2,
-               
-               show.legend = FALSE
-  )+
-  geom_text(data = southamerica_names,
-            aes(x=lon, y=lat, label= str_wrap(name_long,20)), 
-            color = "black", 
-            fontface = "bold", 
-            size = 2.9
-  )+
-  
-  coord_sf(xlim = c(xmin,xmax), ylim=c(ymin,ymax))+
-  scale_fill_continuous_sequential(palette= "Heat 2" )+
-  theme_void() +
-  theme(
-    panel.background = element_rect(fill="#0077be")
-  ) +
-  labs(
-    fill= str_wrap("População em milhões de habitantes", 30)
-  )
 
-
-
-  
-
-southamerica<-
-  world %>%
-  filter(continent=="South America" |
-           iso_a2=="FR" ) 
